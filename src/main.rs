@@ -113,6 +113,10 @@ fn select_readable(devices: &Vec<Device>, watcher: &Option<Inotify>) -> Result<F
         read_fds.insert(inotify.as_raw_fd());
     }
     select(None, &mut read_fds, None, None, None)?;
+    if let Some(inotify) = watcher {
+        let events = inotify.read_events();
+        println!("Received events from inotify: {:?}", events);
+    }
     return Ok(read_fds);
 }
 
