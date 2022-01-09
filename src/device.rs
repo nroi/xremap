@@ -135,10 +135,14 @@ fn list_devices() -> Result<HashMap<String, Device>, Box<dyn Error>> {
             let path = entry?.path();
             if let Some(fname) = path.file_name() {
                 if fname.as_bytes().starts_with(b"event") {
-                    // Allow "Permission denied" when opening the current process's own device.
-                    if let Ok(device) = Device::open(&path) {
-                        if let Ok(path) = path.into_os_string().into_string() {
-                            path_devices.insert(path, device);
+                    match Device::open(&path) {
+                        Ok(device) => {
+                            if let Ok(path) = path.into_os_string().into_string() {
+                                path_devices.insert(path, device);
+                            }
+                        }
+                        Err(e) => {
+                            println!("Path {:?} cannot be opened: {:?}", path, e);
                         }
                     }
                 }
